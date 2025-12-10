@@ -71,3 +71,59 @@ class DatabaseHandler:
         rows = cursor.fetchall()
         conn.close()
         return rows
+    
+    def get_all_moves(self):
+        """Get all moves from database as tuples (id, name, accuracy, power, pp, priority, effect, class, type)"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute("SELECT * FROM move ORDER BY id")
+            rows = cursor.fetchall()
+            conn.close()
+            return rows
+        except sqlite3.OperationalError:
+            # Move table doesn't exist yet
+            conn.close()
+            return []
+    
+    def get_move_by_id(self, move_id):
+        """Get a move by ID"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute("SELECT * FROM move WHERE id = ?", (move_id,))
+            row = cursor.fetchone()
+            conn.close()
+            return row
+        except sqlite3.OperationalError:
+            conn.close()
+            return None
+    
+    def get_move_by_name(self, name):
+        """Get a move by name (case-insensitive)"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute("SELECT * FROM move WHERE LOWER(name) = LOWER(?)", (name,))
+            row = cursor.fetchone()
+            conn.close()
+            return row
+        except sqlite3.OperationalError:
+            conn.close()
+            return None
+    
+    def get_pokemon_moves(self, pokemon_id):
+        """Get all moves that a Pokemon can learn from pokemon_moves table"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute("""SELECT m.* FROM move m 
+                             INNER JOIN pokemon_moves pm ON m.id = pm.move_id 
+                             WHERE pm.pokemon_id = ? 
+                             ORDER BY m.name""", (pokemon_id,))
+            rows = cursor.fetchall()
+            conn.close()
+            return rows
+        except sqlite3.OperationalError:
+            conn.close()
+            return []

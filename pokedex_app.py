@@ -21,6 +21,10 @@ class PokedexApp:
         self.create_widgets()
         self.refresh_pokemon_list()
     
+    def go_back(self):
+        """Close the Pokedex window"""
+        self.root.destroy()
+    
     def create_widgets(self):
         """Create and configure all GUI widgets"""
         title_label = tk.Label(
@@ -31,6 +35,23 @@ class PokedexApp:
             fg="#2c3e50"
         )
         title_label.pack(pady=10)
+        
+        # Back button
+        back_frame = tk.Frame(self.root, bg="#f0f0f0")
+        back_frame.pack(pady=5, padx=20, fill="x")
+        
+        back_btn = tk.Button(
+            back_frame,
+            text="← Back to Welcome",
+            command=self.go_back,
+            bg="#95a5a6",
+            fg="white",
+            font=("Arial", 10),
+            padx=15,
+            pady=5,
+            cursor="hand2"
+        )
+        back_btn.pack(side="left")
         
         search_frame = tk.Frame(self.root, bg="#f0f0f0")
         search_frame.pack(pady=10, padx=20, fill="x")

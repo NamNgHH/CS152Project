@@ -1,5 +1,6 @@
 import tkinter as tk
 from pokedex_app import PokedexApp
+from damage_calculator import DamageCalculator
 
 class WelcomePage:
     """Welcome page for the Pokedex application"""
@@ -96,16 +97,15 @@ class WelcomePage:
     
     def open_pokedex(self):
         """Open the main Pokedex application"""
-        self.root.destroy()
-        pokedex_root = tk.Tk()
+        pokedex_root = tk.Toplevel(self.root)
         app = PokedexApp(pokedex_root)
-        pokedex_root.mainloop()
     
     def button2_action(self):
         """Placeholder for button 2 action"""
         pass
     
     def button3_action(self):
-        """Placeholder for button 3 action"""
-        pass
+        """Open the damage calculator"""
+        damage_root = tk.Toplevel(self.root)
+        calculator = DamageCalculator(damage_root)
 

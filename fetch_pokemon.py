@@ -50,22 +50,102 @@ connection.commit()
 
 
 cursor.execute("""CREATE TABLE IF NOT EXISTS move (id INTEGER PRIMARY KEY, name TEXT, accuracy INTEGER, power INTEGER, pp INTEGER, priority INTEGER, effect TEXT, class TEXT, type TEXT)""")
-for i in range (1,21):
-    move_url = part_url + "move/" + str(i)
-    response = requests.get(move_url)
+
+# Create pokemon_moves junction table to store Pokemon-Move relationships
+cursor.execute("""CREATE TABLE IF NOT EXISTS pokemon_moves (pokemon_id INTEGER, move_id INTEGER, PRIMARY KEY (pokemon_id, move_id), FOREIGN KEY (pokemon_id) REFERENCES pokemon(id), FOREIGN KEY (move_id) REFERENCES move(id))""")
+
+print("Fetching Pokemon and their moves...")
+
+# Track which moves we've already fetched to avoid duplicate API calls
+fetched_moves = set()
+
+# First, fetch all Pokemon and their moves
+for i in range (1, 21):
+    pokemon_url = part_url + "pokemon/" + str(i)
+    response = requests.get(pokemon_url)
     if response.status_code == 200:
-        move_data = response.json()
-        move_id = int(move_data["id"])
-        move_name = str(move_data["name"])
-        move_accuracy = int(move_data["accuracy"]) if move_data["accuracy"] is not None else 0
-        move_power = int(move_data["power"]) if move_data["power"] is not None else 0
-        move_pp = int(move_data["pp"]) if move_data["pp"] is not None else 0
-        move_priority = int(move_data["priority"]) if move_data["priority"] is not None else 0
-        move_effect = str(move_data["effect_entries"][0]["effect"])
-        move_class = str(move_data["damage_class"]["name"])
-        move_type = str(move_data["type"]["name"])
-        cursor.execute("""INSERT OR REPLACE INTO move (id , name, accuracy, power, pp, priority, effect, class, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-        (move_id, move_name, move_accuracy, move_power, move_pp, move_priority, move_effect, move_class, move_type))
+        pokemon_data = response.json()
+        pokemon_id = int(pokemon_data["id"])
+        print(f"Processing Pokemon #{pokemon_id}: {pokemon_data['name']}")
+        
+        # Extract moves from Pokemon data
+        moves = pokemon_data.get("moves", [])
+        print(f"  Found {len(moves)} moves")
+        
+        # Process each move
+        for move_entry in moves:
+            move_url = move_entry["move"]["url"]
+            move_name = move_entry["move"]["name"]
+            
+            # Extract move ID from URL (format: https://pokeapi.co/api/v2/move/{id}/)
+            move_id_from_url = int(move_url.split("/")[-2])
+            
+            # Fetch move details if we haven't already
+            if move_id_from_url not in fetched_moves:
+                try:
+                    move_response = requests.get(move_url)
+                    if move_response.status_code == 200:
+                        move_data = move_response.json()
+                        move_id = int(move_data["id"])
+                        move_accuracy = int(move_data["accuracy"]) if move_data["accuracy"] is not None else 0
+                        move_power = int(move_data["power"]) if move_data["power"] is not None else 0
+                        move_pp = int(move_data["pp"]) if move_data["pp"] is not None else 0
+                        move_priority = int(move_data["priority"]) if move_data["priority"] is not None else 0
+                        
+                        # Get effect text (may not always exist)
+                        move_effect = ""
+                        if move_data.get("effect_entries") and len(move_data["effect_entries"]) > 0:
+                            move_effect = str(move_data["effect_entries"][0].get("effect", ""))
+                        
+                        move_class = str(move_data["damage_class"]["name"])
+                        move_type = str(move_data["type"]["name"])
+                        
+                        # Insert or update move in database
+                        cursor.execute("""INSERT OR REPLACE INTO move (id, name, accuracy, power, pp, priority, effect, class, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                        (move_id, move_name, move_accuracy, move_power, move_pp, move_priority, move_effect, move_class, move_type))
+                        
+                        fetched_moves.add(move_id)
+                        print(f"    Saved move: {move_name} (ID: {move_id})")
+                except Exception as e:
+                    print(f"    Error fetching move {move_name}: {str(e)}")
+                    continue
+            
+            # Create Pokemon-Move relationship (use move_id_from_url which matches the fetched move_id)
+            try:
+                cursor.execute("""INSERT OR IGNORE INTO pokemon_moves (pokemon_id, move_id) VALUES (?, ?)""",
+                (pokemon_id, move_id_from_url))
+            except Exception as e:
+                print(f"    Error linking move {move_name} to Pokemon {pokemon_id}: {str(e)}")
+        
+        connection.commit()
+
+print(f"\nCompleted! Fetched {len(fetched_moves)} unique moves.")
+
+# Also fetch the initial 20 moves if they weren't already fetched
+print("\nFetching additional moves (1-20)...")
+for i in range (1, 21):
+    if i not in fetched_moves:
+        move_url = part_url + "move/" + str(i)
+        response = requests.get(move_url)
+        if response.status_code == 200:
+            move_data = response.json()
+            move_id = int(move_data["id"])
+            move_name = str(move_data["name"])
+            move_accuracy = int(move_data["accuracy"]) if move_data["accuracy"] is not None else 0
+            move_power = int(move_data["power"]) if move_data["power"] is not None else 0
+            move_pp = int(move_data["pp"]) if move_data["pp"] is not None else 0
+            move_priority = int(move_data["priority"]) if move_data["priority"] is not None else 0
+            
+            move_effect = ""
+            if move_data.get("effect_entries") and len(move_data["effect_entries"]) > 0:
+                move_effect = str(move_data["effect_entries"][0].get("effect", ""))
+            
+            move_class = str(move_data["damage_class"]["name"])
+            move_type = str(move_data["type"]["name"])
+            cursor.execute("""INSERT OR REPLACE INTO move (id, name, accuracy, power, pp, priority, effect, class, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (move_id, move_name, move_accuracy, move_power, move_pp, move_priority, move_effect, move_class, move_type))
+            print(f"  Saved move: {move_name} (ID: {move_id})")
 
 connection.commit()
 connection.close()
+print("\nAll done!")
