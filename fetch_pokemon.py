@@ -50,16 +50,9 @@ connection.commit()
 
 
 cursor.execute("""CREATE TABLE IF NOT EXISTS move (id INTEGER PRIMARY KEY, name TEXT, accuracy INTEGER, power INTEGER, pp INTEGER, priority INTEGER, effect TEXT, class TEXT, type TEXT)""")
-
-# Create pokemon_moves junction table to store Pokemon-Move relationships
 cursor.execute("""CREATE TABLE IF NOT EXISTS pokemon_moves (pokemon_id INTEGER, move_id INTEGER, PRIMARY KEY (pokemon_id, move_id), FOREIGN KEY (pokemon_id) REFERENCES pokemon(id), FOREIGN KEY (move_id) REFERENCES move(id))""")
-
 print("Fetching Pokemon and their moves...")
-
-# Track which moves we've already fetched to avoid duplicate API calls
 fetched_moves = set()
-
-# First, fetch all Pokemon and their moves
 for i in range (1, 21):
     pokemon_url = part_url + "pokemon/" + str(i)
     response = requests.get(pokemon_url)
@@ -67,20 +60,12 @@ for i in range (1, 21):
         pokemon_data = response.json()
         pokemon_id = int(pokemon_data["id"])
         print(f"Processing Pokemon #{pokemon_id}: {pokemon_data['name']}")
-        
-        # Extract moves from Pokemon data
         moves = pokemon_data.get("moves", [])
         print(f"  Found {len(moves)} moves")
-        
-        # Process each move
         for move_entry in moves:
             move_url = move_entry["move"]["url"]
             move_name = move_entry["move"]["name"]
-            
-            # Extract move ID from URL (format: https://pokeapi.co/api/v2/move/{id}/)
             move_id_from_url = int(move_url.split("/")[-2])
-            
-            # Fetch move details if we haven't already
             if move_id_from_url not in fetched_moves:
                 try:
                     move_response = requests.get(move_url)
@@ -91,26 +76,19 @@ for i in range (1, 21):
                         move_power = int(move_data["power"]) if move_data["power"] is not None else 0
                         move_pp = int(move_data["pp"]) if move_data["pp"] is not None else 0
                         move_priority = int(move_data["priority"]) if move_data["priority"] is not None else 0
-                        
-                        # Get effect text (may not always exist)
                         move_effect = ""
                         if move_data.get("effect_entries") and len(move_data["effect_entries"]) > 0:
                             move_effect = str(move_data["effect_entries"][0].get("effect", ""))
                         
                         move_class = str(move_data["damage_class"]["name"])
                         move_type = str(move_data["type"]["name"])
-                        
-                        # Insert or update move in database
                         cursor.execute("""INSERT OR REPLACE INTO move (id, name, accuracy, power, pp, priority, effect, class, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                         (move_id, move_name, move_accuracy, move_power, move_pp, move_priority, move_effect, move_class, move_type))
-                        
                         fetched_moves.add(move_id)
                         print(f"    Saved move: {move_name} (ID: {move_id})")
                 except Exception as e:
                     print(f"    Error fetching move {move_name}: {str(e)}")
                     continue
-            
-            # Create Pokemon-Move relationship (use move_id_from_url which matches the fetched move_id)
             try:
                 cursor.execute("""INSERT OR IGNORE INTO pokemon_moves (pokemon_id, move_id) VALUES (?, ?)""",
                 (pokemon_id, move_id_from_url))
@@ -121,7 +99,6 @@ for i in range (1, 21):
 
 print(f"\nCompleted! Fetched {len(fetched_moves)} unique moves.")
 
-# Also fetch the initial 20 moves if they weren't already fetched
 print("\nFetching additional moves (1-20)...")
 for i in range (1, 21):
     if i not in fetched_moves:
