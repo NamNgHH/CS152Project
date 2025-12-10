@@ -71,3 +71,14 @@ class DatabaseHandler:
         rows = cursor.fetchall()
         conn.close()
         return rows
+    
+    def get_all_pokemon_names(self):
+        """Get all Pokemon names from database"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT name FROM pokemon ORDER BY id")
+        rows = cursor.fetchall()
+        conn.close()
+        return rows    
+
+

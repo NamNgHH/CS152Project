@@ -1,5 +1,6 @@
 import tkinter as tk
 from pokedex_app import PokedexApp
+from teambuilder import TeambuilderApp
 
 class WelcomePage:
     """Welcome page for the Pokedex application"""
@@ -102,8 +103,11 @@ class WelcomePage:
         pokedex_root.mainloop()
     
     def button2_action(self):
-        """Placeholder for button 2 action"""
-        pass
+        """Open the teambuilder"""
+        self.root.destroy()
+        teambuilder_root = tk.Tk()
+        app = TeambuilderApp(teambuilder_root)
+        teambuilder_root.mainloop()
     
     def button3_action(self):
         """Placeholder for button 3 action"""
