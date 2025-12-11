@@ -36,7 +36,8 @@ class Pokemon:
     @classmethod
     def from_db_row(cls, row):
         """Create a Pokemon object from database row"""
-        pokemon_id, name, type1, type2, hp, atk, defense, spatk, spdef, speed, sprites = row
+        # Handle rows with extra columns (abilities) by taking only the first 11 values
+        pokemon_id, name, type1, type2, hp, atk, defense, spatk, spdef, speed, sprites = row[:11]
         return cls(pokemon_id, name, type1, type2, hp, atk, defense, spatk, spdef, speed, sprites)
     
     def to_db_tuple(self):
