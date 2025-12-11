@@ -16,12 +16,18 @@ class PokemonFrame(tk.Frame):
         )
         self.name = ""
         self.item = ""
-
         self.move_1 = ""
         self.move_2 = ""
         self.move_3 = ""
         self.move_4 = ""
-
+        self.ability = ""
+        self.type = ""
+        self.hp_ev = 0
+        self.atk_ev = 0
+        self.def_ev = 0
+        self.sp_atk_ev = 0
+        self.sp_def_ev = 0
+        self.speed_ev = 0   
         self.grid_propagate(False)
         self.create_widgets()
         

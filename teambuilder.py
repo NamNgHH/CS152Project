@@ -37,18 +37,7 @@ class TeambuilderApp:
         for column in range(5):
             button_frame.columnconfigure(column, weight=1)
 
-        back_button = tk.Button(
-            button_frame,
-            text="Back",
-            bg="#27ae60",
-            fg="white",
-            font=("Arial", 11, "bold"),
-            padx=15,
-            pady=5,
-            cursor="hand2"
-        )
-
-        search_btn = tk.Button(
+        export_button = tk.Button(
             button_frame,
             text="Export",
             bg="#3498db",
@@ -56,33 +45,33 @@ class TeambuilderApp:
             font=("Arial", 11, "bold"),
             padx=15,
             pady=5,
-            cursor="hand2"
+            cursor="hand2",
+            command = self.export_pokepaste
         )
-        back_button.grid(row = 0, column = 1)
-        search_btn.grid(row = 0, column = 3)
+        export_button.grid(row = 0, column = 2)
 
 
-        team_window = tk.Frame(self.teambuilder_page, bg="#ffffff")
+        team_window = tk.Frame(self.teambuilder_page, bg="#ffffff", relief="ridge", borderwidth= 5)
         team_window.pack(expand = True)
 
-        pokemon_1 = PokemonFrame(team_window)
-        pokemon_2 = PokemonFrame(team_window)
-        pokemon_3 = PokemonFrame(team_window)
-        pokemon_4 = PokemonFrame(team_window)
-        pokemon_5 = PokemonFrame(team_window)
-        pokemon_6 = PokemonFrame(team_window)
-        pokemon_1.grid(row = 0, column = 0, padx = 5, pady = 5)
-        pokemon_2.grid(row = 0, column = 1, padx = 5, pady = 5)
-        pokemon_3.grid(row = 0, column = 2, padx = 5, pady = 5)
-        pokemon_4.grid(row = 1, column = 0, padx = 5, pady = 5)
-        pokemon_5.grid(row = 1, column = 1, padx = 5, pady = 5)
-        pokemon_6.grid(row = 1, column = 2, padx = 5, pady = 5)
-        pokemon_1.bind("<Button-1>", self.select_pokemon)
-        pokemon_2.bind("<Button-1>", self.select_pokemon)
-        pokemon_3.bind("<Button-1>", self.select_pokemon)
-        pokemon_4.bind("<Button-1>", self.select_pokemon)
-        pokemon_5.bind("<Button-1>", self.select_pokemon)
-        pokemon_6.bind("<Button-1>", self.select_pokemon)
+        self.pokemon_1 = PokemonFrame(team_window)
+        self.pokemon_2 = PokemonFrame(team_window)
+        self.pokemon_3 = PokemonFrame(team_window)
+        self.pokemon_4 = PokemonFrame(team_window)
+        self.pokemon_5 = PokemonFrame(team_window)
+        self.pokemon_6 = PokemonFrame(team_window)
+        self.pokemon_1.grid(row = 0, column = 0, padx = 5, pady = 5)
+        self.pokemon_2.grid(row = 0, column = 1, padx = 5, pady = 5)
+        self.pokemon_3.grid(row = 0, column = 2, padx = 5, pady = 5)
+        self.pokemon_4.grid(row = 1, column = 0, padx = 5, pady = 5)
+        self.pokemon_5.grid(row = 1, column = 1, padx = 5, pady = 5)
+        self.pokemon_6.grid(row = 1, column = 2, padx = 5, pady = 5)
+        self.pokemon_1.bind("<Button-1>", self.select_pokemon)
+        self.pokemon_2.bind("<Button-1>", self.select_pokemon)
+        self.pokemon_3.bind("<Button-1>", self.select_pokemon)
+        self.pokemon_4.bind("<Button-1>", self.select_pokemon)
+        self.pokemon_5.bind("<Button-1>", self.select_pokemon)
+        self.pokemon_6.bind("<Button-1>", self.select_pokemon)
 
         self.selector_page = tk.Frame(self.root, bg="#f0f0f0")
 
@@ -92,11 +81,47 @@ class TeambuilderApp:
         self.selector_page.pack(fill="both", expand=True)
 
     def show_teambuilder(self):
-        self.selector_page.destroy()
+        self.current_selector.destroy()
+        self.selector_page.pack_forget()
         self.teambuilder_page.pack(fill="both", expand=True)
     
     def select_pokemon(self, event):
         current_pokemon = event.widget
         self.hide_teambuilder()
-        current_selector = SelectorFrame(self.selector_page, current_pokemon, self)
-        current_selector.pack(fill = "both", expand = True)
+
+        self.current_selector = SelectorFrame(self.selector_page, current_pokemon, self)
+        self.current_selector.pack(fill = "both", expand = True)
+    
+    def export_pokepaste(self):
+        pokemon_team = [self.pokemon_1, self.pokemon_2, self.pokemon_3, self.pokemon_4, self.pokemon_5, self.pokemon_6]
+        pokepaste = ""
+        for pokemon in pokemon_team:
+            name = pokemon.name.capitalize()
+            ability = pokemon.ability
+            ability = self.format_text(ability)
+            type = pokemon.type.capitalize()
+            item = pokemon.item
+            item = self.format_text(item)
+            move1 = pokemon.move_1
+            move1 = self.format_text(move1)
+            move2 = pokemon.move_2
+            move2 = self.format_text(move2)
+            move3 = pokemon.move_3
+            move3 = self.format_text(move3)
+            move4 = pokemon.move_4
+            move4 = self.format_text(move4)
+            pokepaste += name + " @ " + item + "\n"
+            pokepaste += "Ability: "+ ability + "\n"
+            pokepaste += "Tera Type: " + type + "\n"
+            pokepaste += "EVs: " + str(pokemon.hp_ev) + " HP / " + str(pokemon.atk_ev) + " Atk / " + str(pokemon.def_ev) + " Def / " + str(pokemon.sp_atk_ev) + " SpA / " + str(pokemon.sp_def_ev) + " SpD / " + str(pokemon.speed_ev) + " Spe\n"
+            pokepaste += "- " + move1 + "\n"
+            pokepaste += "- " + move2 + "\n"
+            pokepaste += "- " + move3 + "\n"
+            pokepaste += "- " + move4 + "\n\n"
+            with open("pokepaste.txt", "w") as file:
+                file.write(pokepaste)
+
+    def format_text(self, input):
+        input = ' '.join(input.split('-'))
+        input = input.title()
+        return input

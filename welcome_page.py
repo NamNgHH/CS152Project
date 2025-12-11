@@ -58,7 +58,7 @@ class WelcomePage:
         
         button2 = tk.Button(
             button_frame,
-            text="Button 2",
+            text="Teambuilder",
             command=self.button2_action,
             bg="#9b59b6",
             fg="white",

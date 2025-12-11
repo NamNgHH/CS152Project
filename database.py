@@ -19,7 +19,7 @@ class DatabaseHandler:
         cursor = conn.cursor()
         cursor.execute("""CREATE TABLE IF NOT EXISTS pokemon 
                          (id INTEGER PRIMARY KEY, name TEXT, type1 TEXT, type2 TEXT, 
-                         hp INTEGER, atk INTEGER, def INTEGER, spatk INTEGER, spdef INTEGER, speed INTEGER, sprites TEXT)""")
+                         hp INTEGER, atk INTEGER, def INTEGER, spatk INTEGER, spdef INTEGER, speed INTEGER, sprites TEXT, ability1 TEXT, ability2 TEXT, ability3 TEXT)""")
         conn.commit()
         conn.close()
     
@@ -27,8 +27,8 @@ class DatabaseHandler:
         """Save or update a Pokemon in the database"""
         conn = self.get_connection()
         cursor = conn.cursor()
-        cursor.execute("""INSERT OR REPLACE INTO pokemon (id, name, type1, type2, hp, atk, def, spatk, spdef, speed, sprites) 
-                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", pokemon.to_db_tuple())
+        cursor.execute("""INSERT OR REPLACE INTO pokemon (id, name, type1, type2, hp, atk, def, spatk, spdef, speed, sprites, ability1, ability2, ability3) 
+                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", pokemon.to_db_tuple())
         conn.commit()
         conn.close()
     
@@ -79,6 +79,109 @@ class DatabaseHandler:
         cursor.execute("SELECT name FROM pokemon ORDER BY id")
         rows = cursor.fetchall()
         conn.close()
-        return rows    
-
-
+        return rows
+    
+    def get_all_moves(self):
+        """Get all moves from database as tuples (id, name, accuracy, power, pp, priority, effect, class, type)"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute("SELECT * FROM move ORDER BY id")
+            rows = cursor.fetchall()
+            conn.close()
+            return rows
+        except sqlite3.OperationalError:
+            # Move table doesn't exist yet
+            conn.close()
+            return []
+    
+    def get_move_by_id(self, move_id):
+        """Get a move by ID"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute("SELECT * FROM move WHERE id = ?", (move_id,))
+            row = cursor.fetchone()
+            conn.close()
+            return row
+        except sqlite3.OperationalError:
+            conn.close()
+            return None
+    
+    def get_move_by_name(self, name):
+        """Get a move by name (case-insensitive)"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute("SELECT * FROM move WHERE LOWER(name) = LOWER(?)", (name,))
+            row = cursor.fetchone()
+            conn.close()
+            return row
+        except sqlite3.OperationalError:
+            conn.close()
+            return None
+    
+    def get_pokemon_moves(self, pokemon_id):
+        """Get all moves that a Pokemon can learn from pokemon_moves table"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute("""SELECT m.* FROM move m 
+                             INNER JOIN pokemon_moves pm ON m.id = pm.move_id 
+                             WHERE pm.pokemon_id = ? 
+                             ORDER BY m.name""", (pokemon_id,))
+            rows = cursor.fetchall()
+            conn.close()
+            return rows
+        except sqlite3.OperationalError:
+            conn.close()
+            return []
+        
+    def get_items(self):
+        """Get all items"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute("SELECT name FROM item ORDER BY id")
+            rows = cursor.fetchall()
+            conn.close()
+            return rows
+        except sqlite3.OperationalError:
+            conn.close()
+            return []
+    
+    def get_pokemon_sprite(self, pokemon_id):
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute("SELECT sprites FROM pokemon WHERE id = ?", (pokemon_id,))
+            rows = cursor.fetchall()
+            conn.close()
+            return rows
+        except sqlite3.OperationalError:
+            conn.close()
+            return []
+        
+    def get_pokemon_abilities(self, pokemon_id):
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute("SELECT ability1, ability2, ability3 FROM pokemon WHERE id = ?", (pokemon_id,))
+            rows = cursor.fetchall()
+            conn.close()
+            return rows
+        except sqlite3.OperationalError:
+            conn.close()
+            return []
+            
+    def get_pokemon_type(self, pokemon_id):
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute("SELECT type1 FROM pokemon WHERE id = ?", (pokemon_id,))
+            rows = cursor.fetchone()
+            conn.close()
+            return rows
+        except sqlite3.OperationalError:
+            conn.close()
+            return []
