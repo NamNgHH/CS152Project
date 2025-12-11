@@ -47,14 +47,15 @@ class WelcomePage:
             command=self.open_pokedex,
             bg="#3498db",
             fg="white",
-            font=("Arial", 16, "bold"),
+            font=("Arial", 14, "bold"),
             padx=40,
-            pady=15,
+            pady=12,
             cursor="hand2",
             relief="raised",
-            bd=3
+            bd=3,
+            width=20
         )
-        enter_btn.pack()
+        enter_btn.pack(pady=8)
         
         button2 = tk.Button(
             button_frame,
@@ -62,25 +63,31 @@ class WelcomePage:
             command=self.button2_action,
             bg="#9b59b6",
             fg="white",
-            font=("Arial", 12),
-            padx=30,
-            pady=8,
-            cursor="hand2"
+            font=("Arial", 14, "bold"),
+            padx=40,
+            pady=12,
+            cursor="hand2",
+            relief="raised",
+            bd=3,
+            width=20
         )
-        button2.pack(pady=5)
+        button2.pack(pady=8)
         
         button3 = tk.Button(
             button_frame,
-            text="Button 3",
+            text="Damage Calculator",
             command=self.button3_action,
-            bg="#16a085",
+            bg="#3498db",
             fg="white",
-            font=("Arial", 12),
-            padx=30,
-            pady=8,
-            cursor="hand2"
+            font=("Arial", 14, "bold"),
+            padx=40,
+            pady=12,
+            cursor="hand2",
+            relief="raised",
+            bd=3,
+            width=20
         )
-        button3.pack(pady=5)
+        button3.pack(pady=8)
         
         exit_btn = tk.Button(
             button_frame,
@@ -88,12 +95,15 @@ class WelcomePage:
             command=self.root.quit,
             bg="#e74c3c",
             fg="white",
-            font=("Arial", 12),
-            padx=30,
-            pady=8,
-            cursor="hand2"
+            font=("Arial", 14, "bold"),
+            padx=40,
+            pady=12,
+            cursor="hand2",
+            relief="raised",
+            bd=3,
+            width=20
         )
-        exit_btn.pack(pady=10)
+        exit_btn.pack(pady=8)
     
     def open_pokedex(self):
         """Open the main Pokedex application"""

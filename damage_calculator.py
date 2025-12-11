@@ -1,5 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
+from PIL import Image, ImageTk
+import io
 from database import DatabaseHandler
 from api_handler import PokeAPIHandler
 
@@ -83,127 +85,128 @@ class DamageCalculator:
         main_frame = tk.Frame(self.root, bg="#f0f0f0")
         main_frame.pack(pady=10, padx=20, fill="both", expand=True)
         
-        # Attacker selection frame
-        attacker_frame = tk.LabelFrame(
+        # Single row selection frame
+        selection_frame = tk.LabelFrame(
             main_frame,
-            text="Attacker Pokemon",
-            font=("Arial", 12, "bold"),
+            text="Selection",
+            font=("Arial", 10, "bold"),
             bg="#f0f0f0",
             padx=10,
-            pady=10
+            pady=8
         )
-        attacker_frame.pack(fill="x", pady=10)
+        selection_frame.pack(fill="x", pady=5)
         
+        # Attacker selection
+        attacker_container = tk.Frame(selection_frame, bg="#f0f0f0")
+        attacker_container.pack(side="left", padx=10)
         tk.Label(
-            attacker_frame,
-            text="Select Attacker:",
-            font=("Arial", 11),
+            attacker_container,
+            text="Attacker:",
+            font=("Arial", 9),
             bg="#f0f0f0"
-        ).pack(side="left", padx=5)
-        
+        ).pack(side="left", padx=3)
         self.attacker_combo = ttk.Combobox(
-            attacker_frame,
-            font=("Arial", 11),
-            width=30,
+            attacker_container,
+            font=("Arial", 9),
+            width=15,
             state="readonly"
         )
-        self.attacker_combo.pack(side="left", padx=5)
+        self.attacker_combo.pack(side="left", padx=3)
         self.attacker_combo.bind("<<ComboboxSelected>>", self.on_attacker_selected)
         
-        self.attacker_info_label = tk.Label(
-            attacker_frame,
-            text="",
-            font=("Arial", 10),
-            bg="#f0f0f0",
-            fg="#7f8c8d"
-        )
-        self.attacker_info_label.pack(side="left", padx=10)
-        
-        # Move selection frame
-        move_frame = tk.LabelFrame(
-            main_frame,
-            text="Move",
-            font=("Arial", 12, "bold"),
-            bg="#f0f0f0",
-            padx=10,
-            pady=10
-        )
-        move_frame.pack(fill="x", pady=10)
-        
+        # Move selection
+        move_container = tk.Frame(selection_frame, bg="#f0f0f0")
+        move_container.pack(side="left", padx=10)
         tk.Label(
-            move_frame,
-            text="Select Move:",
-            font=("Arial", 11),
+            move_container,
+            text="Move:",
+            font=("Arial", 9),
             bg="#f0f0f0"
-        ).pack(side="left", padx=5)
-        
+        ).pack(side="left", padx=3)
         self.move_combo = ttk.Combobox(
-            move_frame,
-            font=("Arial", 11),
-            width=30,
+            move_container,
+            font=("Arial", 9),
+            width=15,
             state="readonly"
         )
-        self.move_combo.pack(side="left", padx=5)
+        self.move_combo.pack(side="left", padx=3)
         self.move_combo.bind("<<ComboboxSelected>>", self.on_move_selected)
         
-        self.move_info_label = tk.Label(
-            move_frame,
-            text="(Select a Pokemon first)",
-            font=("Arial", 10),
-            bg="#f0f0f0",
-            fg="#7f8c8d"
-        )
-        self.move_info_label.pack(side="left", padx=10)
-        
-        # Defender selection frame
-        defender_frame = tk.LabelFrame(
-            main_frame,
-            text="Defender Pokemon",
-            font=("Arial", 12, "bold"),
-            bg="#f0f0f0",
-            padx=10,
-            pady=10
-        )
-        defender_frame.pack(fill="x", pady=10)
-        
+        # Defender selection
+        defender_container = tk.Frame(selection_frame, bg="#f0f0f0")
+        defender_container.pack(side="left", padx=10)
         tk.Label(
-            defender_frame,
-            text="Select Defender:",
-            font=("Arial", 11),
+            defender_container,
+            text="Defender:",
+            font=("Arial", 9),
             bg="#f0f0f0"
-        ).pack(side="left", padx=5)
-        
+        ).pack(side="left", padx=3)
         self.defender_combo = ttk.Combobox(
-            defender_frame,
-            font=("Arial", 11),
-            width=30,
+            defender_container,
+            font=("Arial", 9),
+            width=15,
             state="readonly"
         )
-        self.defender_combo.pack(side="left", padx=5)
+        self.defender_combo.pack(side="left", padx=3)
         self.defender_combo.bind("<<ComboboxSelected>>", self.on_defender_selected)
         
-        self.defender_info_label = tk.Label(
-            defender_frame,
-            text="",
-            font=("Arial", 10),
-            bg="#f0f0f0",
-            fg="#7f8c8d"
-        )
-        self.defender_info_label.pack(side="left", padx=10)
+        # Information row below selection boxes
+        info_frame = tk.Frame(main_frame, bg="#f0f0f0")
+        info_frame.pack(fill="x", pady=5)
         
-        # Calculate button
-        calc_btn = tk.Button(
-            main_frame,
-            text="Calculate Damage",
-            command=self.calculate_damage,
-            bg="#e74c3c",
-            fg="white",
-            font=("Arial", 14, "bold"),
-            padx=30,
-            pady=10,
-            cursor="hand2"
+        # Attacker info
+        attacker_info_container = tk.Frame(info_frame, bg="#f0f0f0")
+        attacker_info_container.pack(side="left", padx=20, expand=True)
+        tk.Label(
+            attacker_info_container,
+            text="Attacker:",
+            font=("Arial", 9, "bold"),
+            bg="#f0f0f0"
+        ).pack()
+        self.attacker_info_label = tk.Label(
+            attacker_info_container,
+            text="",
+            font=("Arial", 9),
+            bg="#f0f0f0",
+            fg="#2c3e50"
         )
-        calc_btn.pack(pady=20)
+        self.attacker_info_label.pack()
+        
+        # Move info
+        move_info_container = tk.Frame(info_frame, bg="#f0f0f0")
+        move_info_container.pack(side="left", padx=20, expand=True)
+        tk.Label(
+            move_info_container,
+            text="Move:",
+            font=("Arial", 9, "bold"),
+            bg="#f0f0f0"
+        ).pack()
+        self.move_info_label = tk.Label(
+            move_info_container,
+            text="(Select a Pokemon first)",
+            font=("Arial", 9),
+            bg="#f0f0f0",
+            fg="#2c3e50"
+        )
+        self.move_info_label.pack()
+        
+        # Defender info
+        defender_info_container = tk.Frame(info_frame, bg="#f0f0f0")
+        defender_info_container.pack(side="left", padx=20, expand=True)
+        tk.Label(
+            defender_info_container,
+            text="Defender:",
+            font=("Arial", 9, "bold"),
+            bg="#f0f0f0"
+        ).pack()
+        self.defender_info_label = tk.Label(
+            defender_info_container,
+            text="",
+            font=("Arial", 9),
+            bg="#f0f0f0",
+            fg="#2c3e50"
+        )
+        self.defender_info_label.pack()
         
         # Results frame
         results_frame = tk.LabelFrame(
@@ -214,24 +217,55 @@ class DamageCalculator:
             padx=10,
             pady=10
         )
-        results_frame.pack(fill="both", expand=True, pady=10)
+        results_frame.pack(fill="both", expand=True, pady=5)
         
-        # Results text area
+        # Pokemon sprites frame
+        sprites_frame = tk.Frame(results_frame, bg="#f0f0f0")
+        sprites_frame.pack(pady=15, expand=True)
+        
+        # Attacker sprite
+        attacker_sprite_frame = tk.Frame(sprites_frame, bg="#f0f0f0")
+        attacker_sprite_frame.pack(side="left", padx=30, expand=True)
+        tk.Label(
+            attacker_sprite_frame,
+            text="Attacker",
+            font=("Arial", 12, "bold"),
+            bg="#f0f0f0"
+        ).pack()
+        self.attacker_sprite_label = tk.Label(
+            attacker_sprite_frame,
+            bg="#f0f0f0"
+        )
+        self.attacker_sprite_label.pack()
+        
+        # Defender sprite
+        defender_sprite_frame = tk.Frame(sprites_frame, bg="#f0f0f0")
+        defender_sprite_frame.pack(side="left", padx=30, expand=True)
+        tk.Label(
+            defender_sprite_frame,
+            text="Defender",
+            font=("Arial", 12, "bold"),
+            bg="#f0f0f0"
+        ).pack()
+        self.defender_sprite_label = tk.Label(
+            defender_sprite_frame,
+            bg="#f0f0f0"
+        )
+        self.defender_sprite_label.pack()
+        
+        # Results text area (simplified for damage range only)
         self.results_text = tk.Text(
             results_frame,
-            font=("Courier", 10),
+            font=("Arial", 18, "bold"),
             wrap=tk.WORD,
             bg="white",
             relief="sunken",
             bd=2,
             padx=10,
-            pady=10
+            pady=15,
+            height=3
         )
-        self.results_text.pack(fill="both", expand=True)
-        
-        results_scroll = tk.Scrollbar(results_frame, command=self.results_text.yview)
-        results_scroll.pack(side="right", fill="y")
-        self.results_text.config(yscrollcommand=results_scroll.set)
+        self.results_text.pack(fill="x", pady=15)
     
     def load_pokemon_list(self):
         """Load all Pokemon from database into combo boxes"""
@@ -354,6 +388,9 @@ class DamageCalculator:
                 info += f" | Atk: {self.attacker.atk} | Sp.Atk: {self.attacker.spatk}"
                 self.attacker_info_label.config(text=info)
                 
+                # Display attacker sprite
+                self.display_sprite(self.attacker, self.attacker_sprite_label)
+                
                 # Load moves for this Pokemon
                 self.load_moves_for_pokemon(pokemon_id)
     
@@ -369,6 +406,10 @@ class DamageCalculator:
                     info += f" / {self.defender.type2.capitalize()}"
                 info += f" | Def: {self.defender.defense} | Sp.Def: {self.defender.spdef}"
                 self.defender_info_label.config(text=info)
+                
+                # Display defender sprite
+                self.display_sprite(self.defender, self.defender_sprite_label)
+                
                 self.calculate_damage()
     
     def on_move_selected(self, event):
@@ -407,6 +448,21 @@ class DamageCalculator:
         else:
             self.selected_move = None
     
+    def display_sprite(self, pokemon, label):
+        """Display Pokemon sprite if available"""
+        try:
+            sprite_url = pokemon.get_sprite_url()
+            if sprite_url:
+                image_data = self.api_handler.fetch_sprite_image(sprite_url)
+                if image_data:
+                    image = Image.open(io.BytesIO(image_data))
+                    image = image.resize((200, 200), Image.Resampling.LANCZOS)
+                    photo = ImageTk.PhotoImage(image)
+                    label.config(image=photo)
+                    label.image = photo  # Keep a reference
+        except Exception as e:
+            pass  # Silently fail if sprite can't be loaded
+    
     def get_type_effectiveness(self, attack_type, defender_type1, defender_type2=None):
         """Calculate type effectiveness multiplier"""
         multiplier = 1.0
@@ -434,6 +490,12 @@ class DamageCalculator:
             self.results_text.insert(1.0, "Please select a move to calculate damage.")
             return
         
+        # Display sprites if not already displayed
+        if self.attacker:
+            self.display_sprite(self.attacker, self.attacker_sprite_label)
+        if self.defender:
+            self.display_sprite(self.defender, self.defender_sprite_label)
+        
         self.results_text.delete(1.0, tk.END)
         
         # Get move data: (id, name, accuracy, power, pp, priority, effect, class, type)
@@ -441,17 +503,8 @@ class DamageCalculator:
         
         # Handle status moves (no damage)
         if not power or power == 0:
-            results = "=" * 60 + "\n"
-            results += "MOVE INFORMATION\n"
-            results += "=" * 60 + "\n\n"
-            results += f"MOVE: {move_name.capitalize().replace('-', ' ')} (#{move_id:03d})\n"
-            results += f"  Type: {move_type.capitalize()}\n"
-            results += f"  Damage Class: {move_class.capitalize()}\n"
-            results += f"  Power: 0 (Status Move)\n"
-            results += f"  PP: {pp}\n"
-            results += f"  Accuracy: {accuracy}%\n\n"
-            results += "Status moves deal no damage.\n"
-            results += "=" * 60 + "\n"
+            results = "Damage Range: 0 HP\n(Status moves deal no damage)"
+            self.results_text.delete(1.0, tk.END)
             self.results_text.insert(1.0, results)
             return
         
@@ -504,81 +557,11 @@ class DamageCalculator:
         damage_percent_min = (min_damage / self.defender.hp) * 100
         damage_percent_max = (max_damage / self.defender.hp) * 100
         
-        # Format results
-        results = "=" * 60 + "\n"
-        results += "DAMAGE CALCULATION RESULTS\n"
-        results += "=" * 60 + "\n\n"
-        
-        results += f"ATTACKER: {self.attacker.name.capitalize()} (#{self.attacker.id:03d})\n"
-        results += f"  Type: {self.attacker.type1.capitalize()}"
-        if self.attacker.type2:
-            results += f" / {self.attacker.type2.capitalize()}"
-        results += f"\n  {stat_type} Attack: {attack_stat}\n\n"
-        
-        results += f"DEFENDER: {self.defender.name.capitalize()} (#{self.defender.id:03d})\n"
-        results += f"  Type: {self.defender.type1.capitalize()}"
-        if self.defender.type2:
-            results += f" / {self.defender.type2.capitalize()}"
-        results += f"\n  {stat_type} Defense: {defense_stat}\n  HP: {self.defender.hp}\n\n"
-        
-        results += f"MOVE: {move_name.capitalize().replace('-', ' ')} (#{move_id:03d})\n"
-        results += f"  Type: {move_type.capitalize()}\n"
-        results += f"  Damage Class: {move_class.capitalize()} ({stat_type})\n"
-        results += f"  Base Power: {base_power}\n"
-        results += f"  PP: {pp}\n"
-        results += f"  Accuracy: {accuracy}%\n\n"
-        
-        results += "-" * 60 + "\n"
-        results += "DAMAGE MODIFIERS:\n"
-        
-        # STAB
-        results += f"  STAB (Same Type Attack Bonus): {stab}x"
-        if stab > 1.0:
-            results += f" (✓ {move_type.capitalize()} matches {self.attacker.name.capitalize()}'s type)\n"
-        else:
-            results += " (✗ No match)\n"
-        
-        # Type Effectiveness
-        results += f"\n  Type Effectiveness: {move_type.capitalize()} → {self.defender.type1.capitalize()}"
-        if self.defender.type2:
-            results += f" / {self.defender.type2.capitalize()}"
-        results += "\n"
-        
-        if effectiveness == 0.0:
-            results += "    Multiplier: 0x (No Effect)\n"
-        elif effectiveness == 0.5:
-            results += "    Multiplier: 0.5x (Not Very Effective)\n"
-        elif effectiveness == 0.25:
-            results += "    Multiplier: 0.25x (Not Very Effective ×2)\n"
-        elif effectiveness == 2.0:
-            results += "    Multiplier: 2x (Super Effective)\n"
-        elif effectiveness == 4.0:
-            results += "    Multiplier: 4x (Super Effective ×2)\n"
-        else:
-            results += f"    Multiplier: {effectiveness}x (Normal)\n"
-        
-        results += f"\n  Total Modifier: {stab * effectiveness:.2f}x\n"
-        
-        results += "-" * 60 + "\n"
-        results += "DAMAGE OUTPUT:\n"
-        results += f"  Damage Range: {min_damage} - {max_damage} HP\n"
-        results += f"  Percentage of Defender HP: {damage_percent_min:.1f}% - {damage_percent_max:.1f}%\n"
-        
-        if effectiveness >= 2.0:
-            results += "\n  This move is SUPER EFFECTIVE!\n"
-        elif effectiveness <= 0.5 and effectiveness > 0:
-            results += "\n  This move is NOT VERY EFFECTIVE.\n"
-        elif effectiveness == 0.0:
-            results += "\n  This move has NO EFFECT!\n"
-        
-        results += "\n" + "=" * 60 + "\n"
-        results += "Note: Actual damage may vary based on:\n"
-        results += "  - Move base power (default: 80)\n"
-        results += "  - STAB (Same Type Attack Bonus)\n"
-        results += "  - Critical hits\n"
-        results += "  - Weather/field effects\n"
-        results += "  - Abilities and items\n"
-        
+        # Format results - only show damage range
+        results = f"Damage Range: {min_damage} - {max_damage} HP\n"
+        results += f"({damage_percent_min:.1f}% - {damage_percent_max:.1f}% of Defender's HP)"
+
+        self.results_text.delete(1.0, tk.END)
         self.results_text.insert(1.0, results)
         self.results_text.config(state="normal")
 
