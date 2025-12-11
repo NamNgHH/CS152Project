@@ -52,11 +52,11 @@ class TeambuilderApp:
 
         back_btn = tk.Button(
             button_frame,
-            text="← Back to Welcome",
+            text="Back",
             command=self.go_back,
-            bg="#95a5a6",
+            bg="#27ae60",
             fg="white",
-            font=("Arial", 10),
+            font=("Arial", 11, "bold"),
             padx=15,
             pady=5,
             cursor="hand2"

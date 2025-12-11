@@ -37,14 +37,21 @@ class SelectorFrame(tk.Frame):
         selected_pokemon = tk.StringVar()
         names_row = self.database.get_all_pokemon_ids_and_names()
 
+        pokemon_frame = tk.Frame(self, bg="#f0f0f0")
+        pokemon_label = tk.Label(
+            pokemon_frame,
+            text = "Pokemon:"
+        )
         pokemon_box = ttk.Combobox(
-            self,
+            pokemon_frame,
             width = 30,
             textvariable = selected_pokemon,
             state="readonly"
         )
         pokemon_box['values'] = names_row
-        pokemon_box.pack()
+        pokemon_label.pack(side="left")
+        pokemon_box.pack(side="left")
+        pokemon_frame.pack()
         pokemon_box.bind('<<ComboboxSelected>>', self.load_specific_info)
 
         self.selected_move_1 = tk.StringVar()
@@ -77,16 +84,23 @@ class SelectorFrame(tk.Frame):
             state="readonly"
         )
 
+        item_frame = tk.Frame(self, bg="#f0f0f0")
+        item_label = tk.Label(
+            item_frame,
+            text = "Item:"
+        )
         self.selected_item = tk.StringVar()
         item_row = self.database.get_items()
         item_box = ttk.Combobox(
-            self,
+            item_frame,
             width = 30,
             textvariable = self.selected_item,
             state="readonly"
         )
         item_box['values'] = item_row
-        item_box.pack()
+        item_label.pack(side="left")
+        item_box.pack(side="left")
+        item_frame.pack()
         self.sprite_frame = tk.Frame(self, bg="#f0f0f0")
         self.sprite_label = tk.Label(self.sprite_frame, bg="#f0f0f0")
 
@@ -98,8 +112,8 @@ class SelectorFrame(tk.Frame):
             state="readonly"
         )
 
-        ev_frame = tk.Frame(self, bg="#f0f0f0",relief = "solid", borderwidth= 5)
-        ev_frame.pack(side="right", fill="y", pady=5)
+        ev_frame = tk.Frame(self, bg="#f0f0f0",relief = "ridge", borderwidth= 5)
+        ev_frame.pack(side="right", fill="y", pady=5, padx = 50)
         self.total_evs = 508
         ev_count_frame = tk.Frame(ev_frame)
         ev_count_frame.pack()
@@ -238,10 +252,30 @@ class SelectorFrame(tk.Frame):
         pokemon_moves = []
         for i in range(len(move_info)): 
             pokemon_moves.append(move_info[i][1])
-        self.move_box_1.pack()
-        self.move_box_2.pack()
-        self.move_box_3.pack()
-        self.move_box_4.pack()
+        move1_label = tk.Label(
+            self,
+            text = "Move 1:"
+        )
+        move1_label.pack(pady = 5)
+        self.move_box_1.pack(pady = 5)
+        move2_label = tk.Label(
+            self,
+            text = "Move 2:"
+        )
+        move2_label.pack(pady = 5)
+        self.move_box_2.pack(pady = 5)
+        move3_label = tk.Label(
+            self,
+            text = "Move 3:"
+        )
+        move3_label.pack(pady = 5)
+        self.move_box_3.pack(pady = 5)
+        move4_label = tk.Label(
+            self,
+            text = "Move 4:"
+        )
+        move4_label.pack(pady = 5)
+        self.move_box_4.pack(pady = 5)
         self.move_box_1['values'] = pokemon_moves
         self.move_box_2['values'] = pokemon_moves
         self.move_box_3['values'] = pokemon_moves
@@ -251,7 +285,12 @@ class SelectorFrame(tk.Frame):
         abilities = ability_list[0]
         abilities = [a for a in abilities if a is not None]
         self.ability_box['values'] = abilities
-        self.ability_box.pack()
+        ability_label = tk.Label(
+            self,
+            text = "Ability:"
+        )
+        ability_label.pack(pady = 5)
+        self.ability_box.pack(pady = 5)
 
         self.type = self.database.get_pokemon_type(pokemon_id)
 
