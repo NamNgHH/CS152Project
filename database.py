@@ -81,6 +81,7 @@ class DatabaseHandler:
         conn.close()
         return rows
     
+
     def get_all_moves(self):
         """Get all moves from database as tuples (id, name, accuracy, power, pp, priority, effect, class, type)"""
         conn = self.get_connection()
