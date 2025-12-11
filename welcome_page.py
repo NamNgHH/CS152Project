@@ -113,10 +113,8 @@ class WelcomePage:
     
     def button2_action(self):
         """Open the teambuilder"""
-        self.root.destroy()
-        teambuilder_root = tk.Tk()
+        teambuilder_root = tk.Toplevel(self.root)
         app = TeambuilderApp(teambuilder_root)
-        teambuilder_root.mainloop()
     
     def button3_action(self):
         """Open the damage calculator"""

@@ -48,7 +48,20 @@ class TeambuilderApp:
             cursor="hand2",
             command = self.export_pokepaste
         )
-        export_button.grid(row = 0, column = 2)
+        export_button.grid(row = 0, column = 3)
+
+        back_btn = tk.Button(
+            button_frame,
+            text="← Back to Welcome",
+            command=self.go_back,
+            bg="#95a5a6",
+            fg="white",
+            font=("Arial", 10),
+            padx=15,
+            pady=5,
+            cursor="hand2"
+        )
+        back_btn.grid(row = 0, column = 1)
 
 
         team_window = tk.Frame(self.teambuilder_page, bg="#ffffff", relief="ridge", borderwidth= 5)
@@ -125,3 +138,7 @@ class TeambuilderApp:
         input = ' '.join(input.split('-'))
         input = input.title()
         return input
+    
+    def go_back(self):
+        """Close the damage calculator window"""
+        self.root.destroy()
