@@ -9,13 +9,16 @@ import requests
 import io
 
 class SelectorFrame(tk.Frame):
+    """Selector Frame application GUI"""
     def __init__(self, parent, pokemon, teambuilder):
+        """Initialzies selector frame, loading information about pokemon from database"""
         super().__init__(parent, bg = "#f0f0f0")
         self.pokemon_frame = pokemon
         self.teambuilder = teambuilder
         self.database = DatabaseHandler()
         self.api_handler = PokeAPIHandler()
-
+        
+        # Creates save button
         button_frame = tk.Frame(self, bg="#f0f0f0")
         button_frame.pack(side="top", fill="x", pady=5)
 
@@ -34,6 +37,7 @@ class SelectorFrame(tk.Frame):
         )
         save_button.grid(row = 0, column = 1)
 
+        # Displays a box that lets you pick a pokemon
         selected_pokemon = tk.StringVar()
         names_row = self.database.get_all_pokemon_ids_and_names()
 
@@ -53,6 +57,8 @@ class SelectorFrame(tk.Frame):
         pokemon_box.pack(side="left")
         pokemon_frame.pack()
         pokemon_box.bind('<<ComboboxSelected>>', self.load_specific_info)
+
+        # Displays boxes for all of the pokemon information including moves, items and abilities
 
         self.selected_move_1 = tk.StringVar()
         self.move_box_1 = ttk.Combobox(
@@ -112,6 +118,8 @@ class SelectorFrame(tk.Frame):
             state="readonly"
         )
 
+
+        """Creates frames for all the EV stats"""
         ev_frame = tk.Frame(self, bg="#f0f0f0",relief = "ridge", borderwidth= 5)
         ev_frame.pack(side="right", fill="y", pady=5, padx = 50)
         self.total_evs = 508
@@ -196,6 +204,7 @@ class SelectorFrame(tk.Frame):
 
 
     def reset(self):
+        """Resets the page by deleting the selector frame, saving the information selected back to the pokemon frame"""
         self.teambuilder.show_teambuilder()
         self.pokemon_frame.name = self.pokemon_name
         self.pokemon_frame.pokemon_name.config(text=f"Name: {self.pokemon_name}")
@@ -232,9 +241,11 @@ class SelectorFrame(tk.Frame):
 
     
     def load_specific_info(self, event):
+        """Loads pokemon specific information when pokemon is chosen"""
         pokemon_event = event.widget.get()
         pokemon_id, self.pokemon_name = pokemon_event.split(" ", 1)
 
+        # Gets the link to the sprite and displays it
         sprite_list = self.database.get_pokemon_sprite(pokemon_id)
         pokemon_sprite = sprite_list[0][0]
 
@@ -248,6 +259,7 @@ class SelectorFrame(tk.Frame):
         self.sprite_frame.pack(pady=10)
         self.sprite_label.pack()
 
+        #Gets all of the moves of the pokemon and allows you to select them
         move_info = self.database.get_pokemon_moves(pokemon_id)
         pokemon_moves = []
         for i in range(len(move_info)): 
@@ -281,6 +293,7 @@ class SelectorFrame(tk.Frame):
         self.move_box_3['values'] = pokemon_moves
         self.move_box_4['values'] = pokemon_moves
 
+        # Displays avaialable abilities
         ability_list = self.database.get_pokemon_abilities(pokemon_id)
         abilities = ability_list[0]
         abilities = [a for a in abilities if a is not None]
@@ -295,6 +308,7 @@ class SelectorFrame(tk.Frame):
         self.type = self.database.get_pokemon_type(pokemon_id)
 
     def hp_limit(self, _=None):
+        """Puts a limit on the scale due to shared total value between all the scales"""
         partial = self.atk_value.get() + self.def_value.get() + self.sp_atk_value.get() + self.sp_def_value.get() + self.speed_value.get()
         if partial + self.hp_value.get() > self.total_evs:
             self.hp_value.set(self.total_evs - partial)

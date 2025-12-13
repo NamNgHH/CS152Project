@@ -6,15 +6,17 @@ import json
 connection = sqlite3.connect('pokemon_information.db')
 cursor = connection.cursor()
 
+# base url
 part_url = "https://pokeapi.co/api/v2/"
 
+"""Adds more tables if not present"""
 cursor.execute("PRAGMA table_info(pokemon)")
 pokemon_columns = {col[1] for col in cursor.fetchall()}
 for col in ("ability1", "ability2", "ability3"):
     if col not in pokemon_columns:
         cursor.execute(f"ALTER TABLE pokemon ADD COLUMN {col} TEXT")
 
-
+"""Creates a table if it doesn't exist"""
 cursor.execute("""CREATE TABLE IF NOT EXISTS pokemon (id INTEGER PRIMARY KEY, name TEXT, type1 TEXT, type2 TEXT, hp INTEGER, atk INTEGER, def INTEGER, spatk INTEGER, spdef INTEGER, speed INTEGER, sprites TEXT, ability1 TEXT, ability2 TEXT, ability3 TEXT)""")
 
 for i in range (1, 21):
@@ -45,11 +47,12 @@ for i in range (1, 21):
             pokemon_ability3= str(pokemon_data["abilities"][2]["ability"]["name"])
         else:
             pokemon_ability3 = None
+        """Saves information into table"""
         cursor.execute("""INSERT OR REPLACE INTO pokemon (id , name, type1, type2, hp, atk, def, spatk, spdef, speed, sprites, ability1, ability2, ability3) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (pokemon_id, pokemon_name, pokemon_type1, pokemon_type2, pokemon_hp, pokemon_atk, pokemon_def, pokemon_spatk, pokemon_spdef, pokemon_speed, pokemon_sprites, pokemon_ability1, pokemon_ability2, pokemon_ability3))
 connection.commit()
 
-
+"""Creates a table if it doesn't exist"""
 cursor.execute("""CREATE TABLE IF NOT EXISTS item (id INTEGER PRIMARY KEY, name TEXT, effect TEXT, sprites TEXT)""")
 for i in range (1,21):
     item_url = part_url + "item/" + str(i)
@@ -64,7 +67,7 @@ for i in range (1,21):
         (item_id, item_name, item_effect, item_sprite))
 connection.commit()
 
-
+"""Creates a table if it doesn't exist"""
 cursor.execute("""CREATE TABLE IF NOT EXISTS move (id INTEGER PRIMARY KEY, name TEXT, accuracy INTEGER, power INTEGER, pp INTEGER, priority INTEGER, effect TEXT, class TEXT, type TEXT)""")
 cursor.execute("""CREATE TABLE IF NOT EXISTS pokemon_moves (pokemon_id INTEGER, move_id INTEGER, PRIMARY KEY (pokemon_id, move_id), FOREIGN KEY (pokemon_id) REFERENCES pokemon(id), FOREIGN KEY (move_id) REFERENCES move(id))""")
 print("Fetching Pokemon and their moves...")

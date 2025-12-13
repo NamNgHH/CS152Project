@@ -6,6 +6,7 @@ import io
 
 class PokemonFrame(tk.Frame):
     def __init__(self, parent):
+        """Initialize the Teambuilder application"""
         super().__init__(
             parent,
             width = 275, 
@@ -14,6 +15,7 @@ class PokemonFrame(tk.Frame):
             bd = 5,
             bg = "#afa9a9",
         )
+        # Creates variables that can be accessed in other files
         self.name = ""
         self.item = ""
         self.move_1 = ""
@@ -31,6 +33,7 @@ class PokemonFrame(tk.Frame):
         self.grid_propagate(False)
         self.create_widgets()
         
+        # Creates a 2 by 8 grid for even spacing
         for column in range(2):
             self.columnconfigure(column, weight=1)
 
@@ -38,6 +41,7 @@ class PokemonFrame(tk.Frame):
             self.rowconfigure(row, weight=1)
 
     def create_widgets(self):
+        """Creates widgets for the pokemon frame GUI"""
         self.pokemon_name = tk.Label(
             self,
             bg = "#afa9a9",
@@ -76,7 +80,3 @@ class PokemonFrame(tk.Frame):
             text = "EVs:"
         )
         self.pokemon_evs.grid(row = 7, column = 0, sticky = "nw", rowspan= 1, padx = 2, pady = 1)
-
-
-
-

@@ -19,6 +19,8 @@ class TeambuilderApp:
         self.create_widgets()
 
     def create_widgets(self):
+        """Creates widgets for the Teambuilder application"""
+        # Creates title
         title_label = tk.Label(
             self.root, 
             text="Teambuilder", 
@@ -28,15 +30,19 @@ class TeambuilderApp:
         )    
         title_label.pack(pady=10)
 
+        # Creates a frame for the whole page
         self.teambuilder_page = tk.Frame(self.root, bg="#f0f0f0")
         self.teambuilder_page.pack(fill="both", expand=True)
 
+        # Creates a frame for the buttons
         button_frame = tk.Frame(self.teambuilder_page, bg="#f0f0f0")
         button_frame.pack(side="top", fill="x", pady=5)
 
+        # Makes the grids of the frame evenly spaced
         for column in range(5):
             button_frame.columnconfigure(column, weight=1)
 
+        # Creates export button
         export_button = tk.Button(
             button_frame,
             text="Export",
@@ -50,6 +56,7 @@ class TeambuilderApp:
         )
         export_button.grid(row = 0, column = 3)
 
+        # Creates back button
         back_btn = tk.Button(
             button_frame,
             text="Back",
@@ -63,10 +70,11 @@ class TeambuilderApp:
         )
         back_btn.grid(row = 0, column = 1)
 
-
+        # Creates a window for all 6 pokemon of the team
         team_window = tk.Frame(self.teambuilder_page, bg="#ffffff", relief="ridge", borderwidth= 5)
         team_window.pack(expand = True)
 
+        # Creates frames for 6 pokemon
         self.pokemon_1 = PokemonFrame(team_window)
         self.pokemon_2 = PokemonFrame(team_window)
         self.pokemon_3 = PokemonFrame(team_window)
@@ -90,15 +98,18 @@ class TeambuilderApp:
 
 
     def hide_teambuilder(self):
+        """Hides the current page teambuilder page"""
         self.teambuilder_page.pack_forget()
         self.selector_page.pack(fill="both", expand=True)
 
     def show_teambuilder(self):
+        """Destroys the selector page to show the teambuilder agan"""
         self.current_selector.destroy()
         self.selector_page.pack_forget()
         self.teambuilder_page.pack(fill="both", expand=True)
     
     def select_pokemon(self, event):
+        """Displays the selector page and passes through the Pokemon Frame to be accessed"""
         current_pokemon = event.widget
         self.hide_teambuilder()
 
@@ -106,6 +117,8 @@ class TeambuilderApp:
         self.current_selector.pack(fill = "both", expand = True)
     
     def export_pokepaste(self):
+        """Parses and creates proper syntax for exported pokemon information"""
+        """Creates pokepaste.txt text file"""
         pokemon_team = [self.pokemon_1, self.pokemon_2, self.pokemon_3, self.pokemon_4, self.pokemon_5, self.pokemon_6]
         pokepaste = ""
         for pokemon in pokemon_team:
@@ -135,10 +148,11 @@ class TeambuilderApp:
                 file.write(pokepaste)
 
     def format_text(self, input):
+        """Replaces hyphes with spaces and capitalizes"""
         input = ' '.join(input.split('-'))
         input = input.title()
         return input
     
     def go_back(self):
-        """Close the damage calculator window"""
+        """Close the teambuilder window"""
         self.root.destroy()
